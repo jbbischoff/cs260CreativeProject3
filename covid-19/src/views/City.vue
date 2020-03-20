@@ -27,39 +27,42 @@ export default {
   computed: {
     dataSet() {
       return this.$root.$data.dataSet.reduce((result, element) => {
-        if (Object.prototype.hasOwnProperty.call(result, element.countryOrRegion)) {
-          result[element.countryOrRegion].totalConfirmed += element.confirmed;
-          result[element.countryOrRegion].totalDeaths += element.deaths;
-          result[element.countryOrRegion].totalRecovered += element.recovered;
+        if (element.countryOrRegion == "US") {
+          if (Object.prototype.hasOwnProperty.call(result, element.provinceOrState)) {
+            result[element.provinceOrState].totalConfirmed += element.confirmed;
+            result[element.provinceOrState].totalDeaths += element.deaths;
+            result[element.provinceOrState].totalRecovered += element.recovered;
 
-          if (Object.prototype.hasOwnProperty.call(result[element.countryOrRegion].verbose, element.dateReported)) {
-            result[element.countryOrRegion].verbose[element.dateReported].confirmed += element.confirmed;
-            result[element.countryOrRegion].verbose[element.dateReported].deaths += element.deaths;
-            result[element.countryOrRegion].verbose[element.dateReported].recovered += element.recovered;
+            if (Object.prototype.hasOwnProperty.call(result[element.provinceOrState].verbose, element.dateReported)) {
+              result[element.provinceOrState].verbose[element.dateReported].confirmed += element.confirmed;
+              result[element.provinceOrState].verbose[element.dateReported].deaths += element.deaths;
+              result[element.provinceOrState].verbose[element.dateReported].recovered += element.recovered;
+            }
+            else {
+              result[element.provinceOrState].verbose[element.dateReported] = {
+                date: element.dateReported,
+                confirmed: element.confirmed,
+                deaths: element.deaths,
+                recovered: element.recovered
+              };
+            }
           }
           else {
-            result[element.countryOrRegion].verbose[element.dateReported] = {
-              date: element.dateReported,
+            result[element.provinceOrState] = {
+              id: element.provinceOrState,
+              totalConfirmed: element.confirmed,
+              totalDeaths: element.deaths,
+              totalRecovered: element.recovered,
+              verbose: {}
+            };
+            result[element.provinceOrState].verbose[element.dateReported] = {
               confirmed: element.confirmed,
               deaths: element.deaths,
               recovered: element.recovered
             };
           }
         }
-        else {
-          result[element.countryOrRegion] = {
-            id: element.countryOrRegion,
-            totalConfirmed: element.confirmed,
-            totalDeaths: element.deaths,
-            totalRecovered: element.recovered,
-            verbose: {}
-          };
-          result[element.countryOrRegion].verbose[element.dateReported] = {
-            confirmed: element.confirmed,
-            deaths: element.deaths,
-            recovered: element.recovered
-          };
-        }
+
         return result;
       }, {});
     },
